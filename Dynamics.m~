@@ -119,8 +119,7 @@ classdef Dynamics
                     % include cutoff
                     res(i, j) = obj.cutoff(x(i)) * res(i, j);
                     if(i==j)
-                        temp = obj.f(x, u);
-                        res(i, j) = res(i, j)+  temp(i) * obj.dcutoff(x(i));
+                        res(i, j) = res(i, j)+  obj.f(x, u) * obj.dcutoff(x(i));
                     end
                 end
             end

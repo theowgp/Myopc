@@ -1,57 +1,56 @@
 classdef RungeKutta
         
     properties
-        mesh;
+        grid;
+        
+        N;
+        
         A;
         b;
-        c;
         s;
-        N;
+        
+        dynamics;
+        objective;
+        
+        
+        X0;
+     
     end
     
     methods
-        
-        
-        function obj = RungeKutta(mesh, A, b, c, s, N)
-            obj.mesh = mesh;
+                
+        function obj = RungeKutta(grid, dynamics, objective, A, b, s, X0, N)
+            obj.grid = grid;
             obj.A = A;
             obj.b = b;
-            obj.c = c;
             obj.s = s;
             obj.N = N;            
-               
-
+            obj.dynamics = dynamics;
+            obj.objective = objective;
+            obj.X0 = X0;
         end
         
-     
         
-        function solx = solve(obj, x0, f)
-            solx = zeros(obj.N, obj.mesh.n+1);
-            solx(:, 1) = x0;
-            soly = zeros(obj.N, obj.mesh.n, obj.s);
+        
+        
+        function [solx, soly] = solve_forward_equation(obj, solu)
+            solx = zeros(obj.N+1, obj.grid.n+1);
+            solx(:, 1) = obj.X0;
+            soly = zeros(obj.N+1, obj.grid.n, obj.s);
 
             
-            for k=1:obj.mesh.n
+            for k=1:obj.grid.n
                 solx(:, k+1) = solx(:, k);
                 for i=1:obj.s
                    soly(:, k, i) = solx(:, k);
                    for j=1:obj.s
                        if i>j
-%                            if soly(:, k, i) + obj.mesh.h*obj.A(i, j)*f(obj.fmesh(k, j), soly(:, k, j)) >= 0
-                               soly(:, k, i) = soly(:, k, i) + obj.mesh.h*obj.A(i, j)*f(obj.fmesh(k, j), soly(:, k, j));
-%                            else
-%                                soly(:, k, i) = 0;
-%                            end
+                           soly(:, k, i) = soly(:, k, i) + obj.grid.h * obj.A(i, j) * obj.dynamics.F(soly(:, k, j), solu(:, k, j));
                        end
                    end
-%                    if solx(:, k+1) + obj.mesh.h*obj.b(i)*f(obj.fmesh(k, i), soly(:, k, i))  >= 0
-                       solx(:, k+1) = solx(:, k+1) + obj.mesh.h*obj.b(i)*f(obj.fmesh(k, i), soly(:, k, i));
-%                    else
-%                        solx(:, k+1) = 0;
-%                    end
+                   solx(:, k+1) = solx(:, k+1) + obj.grid.h*obj.b(i) * obj.dynamics.F(soly(:, k, i), solu(:, k, i));
                 end
             end
-            solx = solx';
         end
         
         
@@ -59,15 +58,58 @@ classdef RungeKutta
         
         
         
-        function res = fmesh(obj, k, i)
-            res = obj.mesh.t(k) + obj.c(i)*obj.mesh.h;
+        function [solp, solkhi] = solve_adjoint_equation(obj, solu, solx, soly)
+            solp = zeros(obj.N+1, obj.grid.n+1);
+            solp(:, obj.grid.n+1) = -obj.objective.Gxphi(solx(:, obj.grid.n+1));
+            solkhi = zeros(obj.N+1, obj.grid.n, obj.s);
+
+           for k=obj.grid.n:-1:1
+                solp(:, k) = solp(:, k+1);
+%                 for i=1:obj.s
+                for i=obj.s:-1:1    
+                   solkhi(:, k, i) = solp(:, k+1);
+                   for j=1:obj.s
+%                        if i>j
+                       if j>i
+                           solkhi(:, k, i) = solkhi(:, k, i) + obj.grid.h * obj.A(j, i) * obj.b(j)/obj.b(i) * (solkhi(:, k, j)' * obj.dynamics.GxF(soly(:, k, j), solu(:, k, j)))';
+                       end
+                   end
+                   solp(:, k) = solp(:, k) + obj.grid.h * obj.b(i) * (solkhi(:, k, i)' *  obj.dynamics.GxF(soly(:, k, i), solu(:, k, i)))';
+                end
+            end
         end
         
-          
+        
+        
+        
+        
+                                                                                            
+        
+        
+        function res = g_u(obj, solu)
+           [solx, soly] = obj.solve_forward_equation(solu);
+           [solp, solkhi] = obj.solve_adjoint_equation(solu, solx, soly);
+            
+           res = zeros(obj.N+1, obj.grid.n, obj.s);
+           for k=1:obj.grid.n
+               for i=1:obj.s
+                   res(:, k, i) = -obj.grid.h*obj.b(i) * solkhi(:, k, i)' * obj.dynamics.GuF(soly(:, k, i), solu(:, k, i));
+               end
+           end
+        end
+        
+        
+        
+        
+        
+        
+        
+        
+%         function res = fmesh(obj, k, i)
+%             res = obj.mesh.t(k) + obj.c(i)*obj.mesh.h;
+%         end
+        
     end
-    
-    
-    
     
 end
 
