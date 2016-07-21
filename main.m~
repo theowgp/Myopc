@@ -43,16 +43,17 @@ rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 %% test
 solu = zeros(N+1, n , s);
 % solu = ones(N+1, n , s);
-
 normu = normu(rk.g_u(solu))
-phi = objective.phi(solx(:, mesh.n+1))
 
-[solx, soly] = rk.solve_forward_equation(solu);
+ [solx, soly] = rk.solve_forward_equation(solu);
 %  [solp, solkhi] = rk.solve_adjoint_equation(solu, solx, soly);
  
-%% plot the state solutions with respect to time
 sol = solx;
 % sol = solp;
+
+phi = objective.phi(solx(:, mesh.n+1))
+
+%% plot the state solutions with respect to time
 for i=1:N
     plot(mesh.t, sol(i, :));
     hold all
