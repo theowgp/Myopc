@@ -12,7 +12,7 @@ n = 1000;
 mesh = Mesh(T, n);
 
 %% define the objective
-xT = 0.5;
+xT = 0.2;
 nu = 0.00001;%1;% 0.5;
 alpha = 1;% 0.5;
 objective = Objective(mesh, N, xT, nu, alpha);
@@ -44,11 +44,19 @@ rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 solu = zeros(N+1, n , s);
 % solu = ones(N+1, n , s);
 
-normu = normu(rk.g_u(solu))
-phi = objective.phi(solx(:, mesh.n+1))
-
-[solx, soly] = rk.solve_forward_equation(solu);
+% [solx, soly] = rk.solve_forward_equation(solu);
 %  [solp, solkhi] = rk.solve_adjoint_equation(solu, solx, soly);
+
+% normsolu = normsolu(rk.g_u(solu), mesh)
+% phi = objective.phi(solx(:, mesh.n+1))
+
+
+eps = 1;% not used yet
+sigma = 0.001;
+limitLS = 10;
+limitA = 10;
+[solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
+
  
 %% plot the state solutions with respect to time
 sol = solx;
