@@ -39,8 +39,8 @@ c = [0  0.5  1];
 s = 3;
 rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 
-% %% test
-% solu = zeros(n, s);
+%% test
+solu = zeros(n, s);
 % solu = ones(n , s);
 
 % [solx, soly] = rk.solve_forward_equation(solu);
@@ -49,14 +49,12 @@ rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 % normsolu = normsolu(rk.g_u(solu), mesh)
 % phi = objective.phi(solx(:, mesh.n+1))
 
-%% run Minimization
-solu = zeros(n, s);
 
 eps = 1;% not used yet
 sigma = 0.001;
 limitLS = 5;
 limitA = 10;
-[solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
+% [solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
 
  
 % %% plot the state solutions with respect to time

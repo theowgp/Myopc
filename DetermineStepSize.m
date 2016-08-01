@@ -15,6 +15,16 @@ kA
 
 
 
+N = objective.N;
+%% plot the state solutions with respect to time
+figure
+for i=1:N
+    plot(mesh.t, solx(i, :));
+    hold all
+end
+
+
+
 res = s;
 end
 

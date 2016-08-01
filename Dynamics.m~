@@ -52,7 +52,9 @@ classdef Dynamics
                         temp2 = temp2*  x(j) ^(obj.beta(i)*obj.w(i, j) );
 
                 end
-                res(i) =  temp1/(x(i)^(obj.gamma(i) - 1))  - temp2/(x(i)^(obj.beta(i) - 1));
+                temp1 = temp1/(x(i)^(obj.gamma(i) - 1));
+                temp2 = temp2/(x(i)^(obj.beta(i) - 1));
+                res(i) =  temp1  - temp2;
                 
                 % include cutoff
                 res(i) = obj.cutoff(x(i)) * res(i);
@@ -110,7 +112,7 @@ classdef Dynamics
                             temp3 = temp3*  x(k) ^(obj.gamma(i)*obj.v(i, k));
                             temp4 = temp4*  x(k) ^(obj.beta(i)*obj.w(i, k) );
                         end
-                        part1 = obj.dcutoff(x(i)) * ( temp3/(x(i)^(obj.gamma(i) - 1))  -  temp4/(x(i)^(obj.beta(i) - 1)) );
+                        part1 = obj.dcutoff(x(i)) * ( term3/(x(i)^(obj.gamma(i) - 1))  -  temp5/(x(i)^(obj.beta(i) - 1)) );
                         
                         part2 = obj.cutoff(x(i)) * ( (obj.gamma(i)*obj.v(i, i) - obj.gamma(i) + 1) * x(i)^(obj.gamma(i)*obj.v(i, i) - obj.gamma(i)) * temp1  -  (obj.beta(i)*obj.w(i, i) - obj.beta(i) + 1) * x(i)^(obj.beta(i)*obj.w(i, i) - obj.beta(i)) * temp2  );
                         

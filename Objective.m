@@ -2,8 +2,6 @@ classdef Objective
     
     
     properties
-        grid;
-        
         N;
         
         xT;
@@ -19,8 +17,7 @@ classdef Objective
     end
     
     methods
-        function obj = Objective(grid, N, xT, nu, alpha)
-            obj.grid = grid;
+        function obj = Objective(N, xT, nu, alpha)
             obj.N = N;
             obj.xT = xT;
             obj.nu = nu;
@@ -29,12 +26,12 @@ classdef Objective
         
         
         function res = phi(obj, x)
-            res = 0.5 * obj.alpha * norm(x(1:obj.N) - obj.xT)^2 + x(obj.N+1);
+            res = 0.5 * obj.alpha * (x(1) - obj.xT)^2 + x(obj.N+1);
         end
         
         function res = Gxphi(obj, x)
             res = zeros(obj.N+1, 1);
-            res(1:obj.N) = obj.alpha * (x(1:obj.N) - obj.xT);
+            res(1) = obj.alpha * (x(1) - obj.xT);
             res(obj.N+1) = 1;
         end
     end

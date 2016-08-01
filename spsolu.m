@@ -1,11 +1,9 @@
 function res = spsolu(u, v, mesh)
-[N, n, s] = size(u);
+[n, s] = size(u);
 
 temp = 0;
-for i=1:N
-    for k=1:n
-        temp = temp+    u(i, k, 1) * v(i, k, 1);
-    end
+for k=1:n
+    temp = temp+    u(k, 1) * v(k, 1);
 end
 
 res = mesh.h * temp;
