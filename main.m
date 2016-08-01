@@ -4,11 +4,11 @@ clear all
 N = 3;
 
 %% define mesh
-T = 300;
+T = 5;
 % T = 1000;
 % T = 30;
 % T = 5;
-n = 1000;
+n = 100;
 mesh = Mesh(T, n);
 
 %% define the objective
@@ -54,19 +54,19 @@ solu = zeros(n, s);
 
 eps = 1;% not used yet
 sigma = 0.001;
-limitLS = 5;
+limitLS = 10;
 limitA = 10;
 [solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
 
  
-% %% plot the state solutions with respect to time
-% sol = solx;
-% % sol = solp;
-% 
-% for i=1:N
-%     plot(mesh.t, sol(i, :));
-%     hold all
-% end
+%% plot the state solutions with respect to time
+sol = solx;
+% sol = solp;
+
+for i=1:N
+    plot(mesh.t, sol(i, :));
+    hold all
+end
 
 
 
