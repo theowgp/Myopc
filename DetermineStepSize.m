@@ -1,4 +1,4 @@
-function res = DetermineStepSize(rk, objective, mesh, solu, g, drct, sigma, limitA)
+function [res, kA] = DetermineStepSize(rk, objective, mesh, solu, g, drct, sigma, limitA)
 
 s = 100;
 
@@ -11,17 +11,10 @@ while objective.phi(solxA(:, mesh.n+1)) > objective.phi(solx(:, mesh.n+1))  + si
     [solxA, solyA] = rk.solve_forward_equation(solu + s*drct);
     kA = kA +1;
 end
-kA
 
 
 
-N = objective.N;
-%% plot the state solutions with respect to time
-figure
-for i=1:N
-    plot(mesh.t, solx(i, :));
-    hold all
-end
+% plotsolution(rk, solu)
 
 
 
