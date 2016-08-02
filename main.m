@@ -4,25 +4,31 @@ clear all
 N = 3;
 
 %% define mesh
-T = 8;
-% T = 1000;
+% T = 10;% best time control for a bad matrix is 8 or 9, above complex values are reached
+T = 100;
 % T = 30;
 % T = 5;
 n = 1000;
 mesh = Mesh(T, n);
 
 %% define the objective
-xT = 0.5;
+xT = 0.1;
 nu = 0.00001;%1;% 0.5;
 alpha = 1;% 0.5;
 objective = Objective(N, xT, nu, alpha);
 
 %% define dynamics
-v = [1/2 0 1/2; 1/2 1/2 0; 0 1/2 1/2]; % wrong matrix!!!!!!!!!!
-w = [1/2 1/2 0; 1/2 0 1/2; 1/2 0 1/2]; % wrong matrix!!!!!!!!!!
+% bad matrices
+% v = [1/2 0 1/2; 1/2 1/2 0; 0 1/2 1/2]; 
+% w = [1/2 1/2 0; 1/2 0 1/2; 1/2 0 1/2]; 
 
+% good matrices
 % v = [1/7 1/4 17/28; 1/6  1/8 34/48; 1/5 1/3 7/15];
 % w = [1/9 1/3 15/27; 1/11 1/7 59/77; 1/8 1/5 27/40];
+
+% one positive one negative and a zero real eigenvalues
+v = [0  1/3   2/3; 1/3  0  2/3; 1/3  2/3  0]; 
+w = [0 1/2 1/2; 1/2 0 1/2; 1/2 1/2 0];
 
 gamma = ones(N, 1);
 beta = ones(N, 1);
@@ -42,36 +48,22 @@ c = [0  0.5  1];
 s = 3;
 rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 
-%% test
-% solu = zeros(n, s);
-% % solu = ones(n , s);
-% 
-% [solx, soly] = rk.solve_forward_equation(solu);
-% [solp, solkhi] = rk.solve_adjoint_equation(solu, solx, soly);
-% 
-% % normsolu = normsolu(rk.g_u(solu), mesh)
-% % phi = objective.phi(solx(:, mesh.n+1))
-
-%% run Minimization
+%% initial guess
 solu = zeros(n, s);
-% plot solution for the initial guess
+
+%% plot solution for the initial guess
 plotsolution(rk, solu);
 
+%% run Minimization
 eps = 1;% not used yet
 sigma = 0.001;
 limitLS = 5;
 limitA = 10;
 [solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
-
- 
+  
 %% plot the final solutions with respect to time
-sol = solx;
-% sol = solp;
 
-for i=1:N
-    plot(mesh.t, sol(i, :));
-    hold all
-end
+plotsolutionx(solx, mesh, N)
 
 
 
