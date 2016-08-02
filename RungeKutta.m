@@ -45,10 +45,10 @@ classdef RungeKutta
                    soly(:, k, i) = solx(:, k);
                    for j=1:obj.s
                        if i>j
-                           soly(:, k, i) = soly(:, k, i) + obj.grid.h * obj.A(i, j) * obj.dynamics.F(soly(:, k, j), solu(k, j));
+                           soly(:, k, i) = soly(:, k, i) + obj.grid.h * obj.A(i, j) * obj.dynamics.F(soly(:, k, j), solu(:, k, j));
                        end
                    end
-                   solx(:, k+1) = solx(:, k+1) + obj.grid.h*obj.b(i) * obj.dynamics.F(soly(:, k, i), solu(k, i));
+                   solx(:, k+1) = solx(:, k+1) + obj.grid.h*obj.b(i) * obj.dynamics.F(soly(:, k, i), solu(:, k, i));
                 end
             end
         end
@@ -71,10 +71,10 @@ classdef RungeKutta
                    for j=1:obj.s
 %                        if i>j
                        if j>i
-                           solkhi(:, k, i) = solkhi(:, k, i) + obj.grid.h * obj.A(j, i) * obj.b(j)/obj.b(i) * (solkhi(:, k, j)' * obj.dynamics.GxF(soly(:, k, j)))';
+                           solkhi(:, k, i) = solkhi(:, k, i) + obj.grid.h * obj.A(j, i) * obj.b(j)/obj.b(i) * (solkhi(:, k, j)' * obj.dynamics.GxF(soly(:, k, j), solu(:, k, j)))';
                        end
                    end
-                   solp(:, k) = solp(:, k) + obj.grid.h * obj.b(i) * (solkhi(:, k, i)' *  obj.dynamics.GxF(soly(:, k, i)))';
+                   solp(:, k) = solp(:, k) + obj.grid.h * obj.b(i) * (solkhi(:, k, i)' *  obj.dynamics.GxF(soly(:, k, i), solu(:, k, i)))';
                 end
             end
         end
@@ -90,10 +90,10 @@ classdef RungeKutta
            [solx, soly] = obj.solve_forward_equation(solu);
            [solp, solkhi] = obj.solve_adjoint_equation(solu, solx, soly);
             
-           res = zeros(obj.grid.n, obj.s);
+           res = zeros(obj.N+1, obj.grid.n, obj.s);
            for k=1:obj.grid.n
                for i=1:obj.s
-                   res(k, i) = -obj.grid.h*obj.b(i) * solkhi(:, k, i)' * obj.dynamics.GuF(solu(k, i));
+                   res(:, k, i) = -obj.grid.h*obj.b(i) * solkhi(:, k, i)' * obj.dynamics.GuF(soly(:, k, i), solu(:, k, i));
                end
            end
         end

@@ -12,30 +12,28 @@ n = 1000;
 mesh = Mesh(T, n);
 
 %% define the objective
-xT = 0.1;
+xT = 0.5;
 nu = 0.00001;%1;% 0.5;
 alpha = 1;% 0.5;
 objective = Objective(N, xT, nu, alpha);
 
 %% define dynamics
 % bad matrices
-% v = [1/2 0 1/2; 1/2 1/2 0; 0 1/2 1/2]; 
-% w = [1/2 1/2 0; 1/2 0 1/2; 1/2 0 1/2]; 
+vb = [1/2 0 1/2; 1/2 1/2 0; 0 1/2 1/2]; 
+wb = [1/2 1/2 0; 1/2 0 1/2; 1/2 0 1/2]; 
 
 % good matrices
-% v = [1/7 1/4 17/28; 1/6  1/8 34/48; 1/5 1/3 7/15];
-% w = [1/9 1/3 15/27; 1/11 1/7 59/77; 1/8 1/5 27/40];
+v = [1/7 1/4 17/28; 1/6  1/8 34/48; 1/5 1/3 7/15];
+w = [1/9 1/3 15/27; 1/11 1/7 59/77; 1/8 1/5 27/40];
 
-% one positive one negative and a zero real eigenvalues
-v = [0  1/3   2/3; 1/3  0  2/3; 1/3  2/3  0]; 
-w = [0 1/2 1/2; 1/2 0 1/2; 1/2 1/2 0];
+%goodbad matrices
+% v = [0  1/3   2/3; 1/3  0  2/3; 1/3  2/3  0]; 
+% w = [0 1/2 1/2; 1/2 0 1/2; 1/2 1/2 0];
 
-gamma = ones(N, 1);
-beta = ones(N, 1);
 
 xmax = 1;
 
-dynamics = Dynamics(N, v, w, gamma, beta, xmax, objective);
+dynamics = Dynamics(N, v, w, vb, wb, xmax, objective);
 
 %% define initial value
 x0 = [0.3   0.6  0.9 ]';
@@ -49,7 +47,17 @@ s = 3;
 rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 
 %% initial guess
-solu = zeros(n, s);
+solu = zeros(N+1, n, s);
+% solu = ones(N+1, n, s);
+
+%% test
+% [solx, soly] = rk.solve_forward_equation(solu);
+% %[solp, solkhi] = rk.solve_adjoint_equation(solu, solx, soly); 
+% 
+% phi = objective.phi(solx(:, mesh.n+1))
+% normg_u = normsolu(rk.g_u(solu), mesh)
+
+
 
 %% plot solution for the initial guess
 plotsolution(rk, solu);
@@ -57,12 +65,11 @@ plotsolution(rk, solu);
 %% run Minimization
 eps = 1;% not used yet
 sigma = 0.001;
-limitLS = 5;
+limitLS = 100;
 limitA = 10;
 [solx, solu] = NCG(rk, objective, mesh, solu, eps, sigma, limitLS, limitA);
   
 %% plot the final solutions with respect to time
-
 plotsolutionx(solx, mesh, N)
 
 
