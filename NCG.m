@@ -8,7 +8,7 @@ drct = - g;
 
 kLS = 0;
 while  kLS<limitLS
-    step = DetermineStepSize(rk, objective, mesh, solu, g, drct, sigma, limitA);
+    [step, kA] = DetermineStepSize(rk, objective, mesh, solu, g, drct, sigma, limitA);
 %     solu = Project(solu, step, drct);
     solu = solu + step * drct;
     gnext = rk.g_u(solu);
@@ -27,7 +27,7 @@ while  kLS<limitLS
     [solx, soly] = rk.solve_forward_equation(solu);
     Phi = objective.phi(solx(:, mesh.n+1));
     
-    disp([kLS, Phi, Gradient]); % , s, normsolu(solu, N, d, grid), normsolu(drct, N, d, grid)]);
+    disp([kLS, kA, Phi, Gradient]); % , s, normsolu(solu, N, d, grid), normsolu(drct, N, d, grid)]);
     
 end
 

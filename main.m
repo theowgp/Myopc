@@ -4,7 +4,7 @@ clear all
 N = 3;
 
 %% define mesh
-T = 5;
+T = 2;
 % T = 1000;
 % T = 30;
 % T = 5;
@@ -12,21 +12,13 @@ n = 100;
 mesh = Mesh(T, n);
 
 %% define the objective
-xT = 0.5;
+xT = 0.5; %0.5;
 nu = 0.00001;%1;% 0.5;
 alpha = 1;% 0.5;
 objective = Objective(N, xT, nu, alpha);
 
 %% define dynamics
-v = [1/2 0 1/2; 1/2 1/2 0; 0 1/2 1/2]; % wrong matrix!!!!!!!!!!
-w = [1/2 1/2 0; 1/2 0 1/2; 1/2 0 1/2]; % wrong matrix!!!!!!!!!!
-
-gamma = ones(N, 1);
-beta = ones(N, 1);
-
-xmax = 1;
-
-dynamics = Dynamics(N, v, w, gamma, beta, xmax, objective);
+dynamics = Dynamics(N, objective);
 
 %% define initial value
 x0 = [0.3   0.6  0.9 ]';
@@ -39,13 +31,13 @@ c = [0  0.5  1];
 s = 3;
 rk = RungeKutta(mesh, dynamics, objective, A, b, s, X0, N);
 
-% %% test
+%% test
 % solu = zeros(n, s);
-% solu = ones(n , s);
-
+% % solu = ones(n , s);
+% 
 % [solx, soly] = rk.solve_forward_equation(solu);
 % [solp, solkhi] = rk.solve_adjoint_equation(solu, solx, soly);
-
+% 
 % normsolu = normsolu(rk.g_u(solu), mesh)
 % phi = objective.phi(solx(:, mesh.n+1))
 
@@ -67,42 +59,4 @@ for i=1:N
     plot(mesh.t, sol(i, :));
     hold all
 end
-
-
-
-
-
-%%% test
-% %% plot the state solutions with respect to each other  (3D)
-% figure
-% plot3(sol(:, 1), sol(:, 2), sol(:, 3), 'LineWidth', 2);   
-% plot3(sol(:, 1), sol(:, 2), sol(:, 3)); 
-% plot(sol(:, 1), sol(:, 2), 'LineWidth', 2); 
-
-% %% test
-% % display( 'dynamics at the final time:')
-% % mytest = dynamics.f(0, sol(:, rk.mesh.n+1))
-% % display( 'state at the final time:')
-% % sol(:, rk.mesh.n+1)
-% % display( 'det(v-w):')
-% % det(v-w)
-% % display( 'det(v):')
-% % det(v)
-% % display( 'det(w):')
-% % det(w)
-% % display( 'v-w:')
-% % v-w                    
-% 
-% 
-% 
-% 
-% % display( 'eig(v-w):')
-% % [S, L] = eig(v-w)
-% 
-% 
-% % a = [1; -0.5; -0.5];
-% % test(dynamics, 20, 0.01, a);
-% 
-% 
-% % testfi;
 

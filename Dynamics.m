@@ -2,13 +2,7 @@ classdef Dynamics
        
     properties
         N;
-        
-        v;
-        w;
-        
-        gamma;
-        beta;
-      
+  
 
         
                 
@@ -25,22 +19,24 @@ classdef Dynamics
     
     methods
         
-        function obj = Dynamics(N, v, w, gamma, beta, xmax, objective)
+        function obj = Dynamics(N, objective)
             obj.N = N;
-            obj.v = v;
-            obj.w = w;
-            obj.gamma = gamma;
-            obj.beta = beta;
-            obj.xmax = xmax;
             obj.objective = objective;
-            
-          
         end
         
        
         
         function res = f(obj, x, u)
-            res = ones(obj.N, 1)';
+            res = zeros(obj.N, 1)';
+            
+            for i=1:obj.N
+                temp = 0;
+                for k=1:obj.N
+                    temp = temp+    x(k);
+                end
+                res(i) = temp/obj.N;
+            end
+            
             
             % include controll
             res(1) = res(1)+   u;
@@ -59,7 +55,8 @@ classdef Dynamics
 
            
         function res = Gxf(obj, x)
-            res = zeros(obj.N, obj.N);
+            res = ones(obj.N, obj.N);
+            res = res/obj.N;
         end
         
         function res = GxF(obj, x)
